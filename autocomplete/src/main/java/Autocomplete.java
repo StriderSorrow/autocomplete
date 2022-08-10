@@ -3,7 +3,32 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Autocomplete {
+
+
+    public static void main(String[] args) {
+        if (args.length != 0)
+        {
+            if (args.length == 1)
+            {
+                if (isNumeric(args[0])) {
+                    int x = Integer.parseInt(args[0]);
+                    airports(x);
+                }
+                else {
+                    System.out.println("Значение параметра должно быть цифровым!");
+                }
+            }
+            else{
+                System.out.println("Для работы программы необходим только один параметр!");
+            }
+        }
+        else{
+            System.out.println("Для работы программы необходим один параметр!");
+        }
+    }
+
     public static boolean isNumeric(String str) {
+        //Метод проверяет, являются ли значения параметра цифровыми
         try {
             Double.parseDouble(str);
             return true;
@@ -13,15 +38,14 @@ public class Autocomplete {
     }
 
     public static void airports(int x){
-        String file = "airports.csv";
-
+        //Блок объявления переменных
         TreeMap<String, String> map = new TreeMap<>();
         TreeMap<Integer, String> sortedMap = new TreeMap<>();
-
-
         ClassLoader classLoader = Autocomplete.class.getClassLoader();
-
+        String file = "airports.csv";
         String line;
+
+        //"Вытаскивание" файла CSV из ресурсов проекта
         try (InputStream inputStream = classLoader.getResourceAsStream(file)) {
             assert inputStream != null;
             try (InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -30,11 +54,12 @@ public class Autocomplete {
                 Scanner console = new Scanner(System.in);
                 System.out.print("Введите текст: ");
                 String search = console.nextLine();
-
                 if (Objects.equals(search, "!quit")){
                     System.exit(0);
                 }
                 long start = System.currentTimeMillis();
+
+                //основной цикл поиска
                 while ((line = reader.readLine()) != null) {
                     String[] row = line.split(",");
                     for(int i = 0; i < row.length; i++){
@@ -46,6 +71,8 @@ public class Autocomplete {
                     }
                 }
                 if (!map.isEmpty()) {
+
+                    //Если элементы столбца цифровые, происходит сортировка и их вывод в консоль
                     if (isNumeric(map.firstKey())){
                         for (Map.Entry<String, String> entry : map.entrySet()) {
                             sortedMap.put(Integer.parseInt(entry.getKey()), entry.getValue());
@@ -54,6 +81,8 @@ public class Autocomplete {
                             System.out.println(entry.getKey() + "[" + entry.getValue() + "]");
                         }
                     }
+                    //Если элементы столбца ,буквенные, сразу происходит их вывод в консоль,
+                    //так как они уже отсортированы в лексикографическом порядке
                     else {
                         for (Map.Entry<String, String> entry : map.entrySet()) {
                             System.out.println(entry.getKey() + "[" + entry.getValue() + "]");
@@ -70,15 +99,8 @@ public class Autocomplete {
         }
         catch (Exception e) {
             e.printStackTrace();
-
         }
         airports(x);
     }
-
-    public static void main(String[] args) {
-        int x = Integer.parseInt(args[0]);
-        airports(x);
-    }
-
 }
 
